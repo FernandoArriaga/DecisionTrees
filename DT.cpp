@@ -111,13 +111,15 @@ attributenode* inatt(void)
     float ntrpy=0;
     float inG=Intrpy;
     float maxinG=0;
+    float dsize;
     attributenode* p;
 for(int i=0;i<attributes.size();i++)
-    {
+    {   inG=Intrpy;
         for(int j=0;j<attributes[i]->MyValues.size();j++)
         {
+            dsize=Dset.size();
             ntrpy=entropy(attributes[i]->MyValues[j]);
-            inG-=(attributes[i]->MyValues[j]->mysize/Dset.size())*ntrpy;
+            inG-=(attributes[i]->MyValues[j]->mysize/dsize)*ntrpy;
         }
         if(inG>maxinG)
             {
@@ -164,7 +166,7 @@ void read_data(){
 	std::string line;
 	std::getline(std::cin, line);
 	while(line.empty() != true){
-		if(line[0] == '%')
+		while(line[0] == '%')
 			std::getline(std::cin, line);
 		if(line.find("@relation") != -1){
 			std::string relation = line.substr(line.find(" ")+1);
@@ -249,12 +251,12 @@ int main(){
     }
     Fresult=attributes[(attributes.size()-1)];
     attributes.pop_back();
-    //std::cout<<Dset[1]->features[1];
-    //std::cout<<attributes.size()<<std::endl;
+    std::cout<<Dset.size();
+    std::cout<<attributes.size()<<std::endl;
     //std::cout<<attributes[(attributes.size()-1)]->Name<<std::endl;
     //std::cout<<Fresult->Name;
     Intrpy=initentropy();
     std::cout<<Intrpy;
     Head=inatt();
-    std::cout<<Head->Name<<Head->MyValues[0]->Myresult;
+    std::cout<<Head->Name;
 }
