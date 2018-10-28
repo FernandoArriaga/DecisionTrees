@@ -94,10 +94,15 @@ void read_data(){
 			attributenode* att=new attributenode;
 			attributes.push_back(att);
 			att->Name.clear();
-			std::string buff;
+			std::string buff,buff2;
 			buff=line.substr(line.find(" ")+1);
+			buff2=buff.substr(0,buff.find(" "));
+			if(buff2.find("	")!=-1)
+           			 {
+           			 buff2=buff.substr(0,buff.find("	"));
+           			 }
 			//To do
-			att->Name+=(buff.substr(0,buff.find(" ")));
+			att->Name+=(buff2);
 			std::cout<<att->Name;
 			att->Myindex=attindex;
 			attindex+=1;
