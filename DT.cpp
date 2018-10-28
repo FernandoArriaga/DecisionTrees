@@ -116,7 +116,7 @@ void read_data(){
     			Van->Name+=token;
     			Van->Myattribute=att;
     			att->MyValues.push_back(Van);
-    			std::cout << Van->Name << std::endl;
+    			//std::cout << Van->Name << std::endl;
     			subline.erase(0, pos + delimiter.length()+1);
 			}
 			while((pos2 = subline.find(delimiter2)) != std::string::npos)
@@ -127,7 +127,7 @@ void read_data(){
     			Van->Name+=token;
     			Van->Myattribute=att;
     			att->MyValues.push_back(Van);
-    			std::cout << Van->Name << std::endl;
+    			//std::cout << Van->Name << std::endl;
     			subline.erase(0, pos2 + delimiter2.length());
             }
 			//std::getline(std::cin, line);
