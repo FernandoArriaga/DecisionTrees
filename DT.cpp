@@ -87,7 +87,7 @@ void read_data(){
 			std::getline(std::cin, line);
 		if(line.find("@relation") != -1){
 			std::string relation = line.substr(line.find(" ")+1);
-			//std::cout << relation;
+			std::cout << relation;
 			std::getline(std::cin, line);
 		}
 		if(line.find("@attribute") != -1){
@@ -98,7 +98,7 @@ void read_data(){
 			buff=line.substr(line.find(" ")+1);
 			//To do
 			att->Name+=(buff.substr(0,buff.find(" ")));
-			//std::cout<<att->Name;
+			std::cout<<att->Name;
 			att->Myindex=attindex;
 			attindex+=1;
 			//std::cout<<att->Myindex;
@@ -116,7 +116,7 @@ void read_data(){
     			Van->Name+=token;
     			Van->Myattribute=att;
     			att->MyValues.push_back(Van);
-    			//std::cout << Van->Name << std::endl;
+    			std::cout << Van->Name << std::endl;
     			subline.erase(0, pos + delimiter.length()+1);
 			}
 			while((pos2 = subline.find(delimiter2)) != std::string::npos)
@@ -127,7 +127,7 @@ void read_data(){
     			Van->Name+=token;
     			Van->Myattribute=att;
     			att->MyValues.push_back(Van);
-    			//std::cout << Van->Name << std::endl;
+    			std::cout << Van->Name << std::endl;
     			subline.erase(0, pos2 + delimiter2.length());
             }
 			//std::getline(std::cin, line);
