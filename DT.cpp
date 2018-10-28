@@ -10,9 +10,16 @@ class attribute;
 class attributenode;
 class Valuenode;
 class resultnode;
+class Data;
+std::vector<Data*>Dset;
+std::vector<attributenode*>attributes;
+int attindex=0;
+attributenode* Fresult;
+bool fdata=0;
 
 class attributenode {
 public:
+int Myindex;
 std::string Name;
 std::vector<Valuenode*> MyValues;
 Valuenode* Parentvalue;
@@ -30,6 +37,11 @@ int mysize;
 float myentropy;
 friend class attributenode;
 
+};
+class Data {
+public:
+std::vector<std::string> features;
+std::string label;
 };
 
 bool isvaluepresent(Valuenode* val2)
@@ -57,7 +69,9 @@ float infoGain(Valuenode*parentv, attributenode*expanded)
 {
 //calculate using the parentv entropy and the entropy of the values of the expanded attribute.
 }
+float initentropy(void){
 
+}
 class attribute{
 	public:
 		std::string name;
@@ -65,7 +79,7 @@ class attribute{
 };
 
 void read_data(){
-	attribute att;
+
 	std::string line;
 	std::getline(std::cin, line);
 	while(line.empty() != true){
@@ -73,38 +87,64 @@ void read_data(){
 			std::getline(std::cin, line);
 		if(line.find("@relation") != -1){
 			std::string relation = line.substr(line.find(" ")+1);
-			std::cout << relation;
+			//std::cout << relation;
 			std::getline(std::cin, line);
 		}
 		if(line.find("@attribute") != -1){
-			att.name.clear();
+			attributenode* att=new attributenode;
+			attributes.push_back(att);
+			att->Name.clear();
+			std::string buff;
+			buff=line.substr(line.find(" ")+1);
 			//To do
-			att.name+=(line.substr(line.find(" ")+1));
-			std::cout<<att.name;
-			std::string subline = line.substr(line.find("{")+1,line.length()-(line.find("{")+2));
-			std::cout<<"\n"<<subline;
+			att->Name+=(buff.substr(0,buff.find(" ")));
+			//std::cout<<att->Name;
+			att->Myindex=attindex;
+			attindex+=1;
+			//std::cout<<att->Myindex;
+			std::string subline = line.substr(line.find("{")+1,line.length()-(line.find("{")+1));
+			//std::cout<<"\n"<<subline;
 			std::string token;
 			size_t pos = 0;
+			size_t pos2 = 0;
 			std::string delimiter = ",";
+			std::string delimiter2 = "}";
 			while ((pos = subline.find(delimiter)) != std::string::npos) {
     			token = subline.substr(0, pos);
-    			att.values.push_back(token);
-    			//std::cout << token << std::endl;
-    			subline.erase(0, pos + delimiter.length());
+    			Valuenode*Van=new Valuenode;
+    			Van->Name.clear();
+    			Van->Name+=token;
+    			Van->Myattribute=att;
+    			att->MyValues.push_back(Van);
+    			//std::cout << Van->Name << std::endl;
+    			subline.erase(0, pos + delimiter.length()+1);
 			}
-			std::getline(std::cin, line);
+			while((pos2 = subline.find(delimiter2)) != std::string::npos)
+            {
+                token = subline.substr(0, pos2);
+    			Valuenode*Van=new Valuenode;
+    			Van->Name.clear();
+    			Van->Name+=token;
+    			Van->Myattribute=att;
+    			att->MyValues.push_back(Van);
+    			//std::cout << Van->Name << std::endl;
+    			subline.erase(0, pos2 + delimiter2.length());
+            }
+			//std::getline(std::cin, line);
 		}
-		else
-			std::getline(std::cin, line);
-		//if(str.find("@data") != -1){
-			
-		//}
-	}
-	
-	
+		if(line.find("@data") != -1){
+            fdata=1;
+            //std::getline(std::cin, line);
+            }
+std::getline(std::cin, line);
+
 }
+	}
 
 int main(){
+    while(!fdata)
+    {
 	read_data();
+	std::cout<<fdata;
+    }
 }
-
