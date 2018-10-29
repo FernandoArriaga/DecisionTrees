@@ -36,6 +36,7 @@ Parentvalue=0;
 class Valuenode {
 public:
 std::string Name;
+std::vector<attributenode*>Posatt;
 attributenode* Nextattribute;
 attributenode* Myattribute;
 std::string Myresult;
@@ -61,7 +62,10 @@ bool findresults(Valuenode* val1,Data* D1)
 {
 //for every parent value check if it's present, use recursion.
 if(val1->Myattribute->Parentvalue!=0)
+{
+    //std::cout<<"yes";
     return (isvaluepresent(val1,D1))&&(findresults(val1->Myattribute->Parentvalue,D1));
+}
 return isvaluepresent(val1,D1);
 }
 
@@ -85,7 +89,8 @@ for(int i=0;i<Fresult->MyValues.size();i++)
         }
 
     }
-
+    //if(VN->Myattribute->Parentvalue!=0)
+    //std::cout<<VN->Myattribute->Parentvalue->Name;
     if(Nres>0)
     {
     dsize=VN->mysize;
@@ -101,9 +106,67 @@ VN->myentropy=ntrpy;
 return ntrpy;
 }
 
-float infoGain(Valuenode*parentv, attributenode*expanded)
+void Nextatt(Valuenode*parentv)
 {
 //calculate using the parentv entropy and the entropy of the values of the expanded attribute.
+float ntrpy=0;
+    float inG=parentv->myentropy;
+    float maxinG=0;
+    float dsize;
+    int index=0;
+    std::vector<attributenode*>buff;
+    attributenode* pn=0;
+    for(int i=0;i<parentv->Posatt.size();i++)
+    {   inG=parentv->myentropy;
+    //std::cout<<inG;
+
+        for(int j=0;j<parentv->Posatt[i]->MyValues.size();j++)
+        {
+            dsize=parentv->mysize;
+            ntrpy=entropy(parentv->Posatt[i]->MyValues[j]);
+            //std::cout<<ntrpy;
+            //std::cout<<parentv->Posatt[i]->MyValues[j]->mysize;
+            inG-=(parentv->Posatt[i]->MyValues[j]->mysize/dsize)*ntrpy;
+        //std::cout<<inG;
+        }
+
+        if(inG>maxinG)
+            {
+            maxinG=inG;
+            pn=parentv->Posatt[i];
+            index=i;
+            }
+    buff.push_back(parentv->Posatt[i]);
+    }
+    buff.erase(buff.begin()+index);
+    for(int k=0;k<pn->MyValues.size();k++)
+    {
+         for(int m =0;m<buff.size();m++)
+        {
+            if(!buff[m]->MyValues.empty())
+            {
+            attributenode* r=new attributenode;
+            r->Name+=buff[m]->Name;
+            r->Myindex=buff[m]->Myindex;
+            r->Parentvalue=pn->MyValues[k];
+            for(int h=0;h<buff[m]->MyValues.size();h++)
+                {
+                    if(!buff[m]->MyValues.empty())
+                        {
+                            Valuenode* q=new Valuenode;
+                            q->Name+=buff[m]->MyValues[h]->Name;
+                            q->Myattribute=r;
+                            r->MyValues.push_back(q);
+                        }
+
+                }
+            pn->MyValues[k]->Posatt.push_back(r);
+            }
+
+        }
+    }
+    parentv->Nextattribute=pn;
+    return ;
 }
 
 attributenode* inatt(void)
@@ -112,6 +175,8 @@ attributenode* inatt(void)
     float inG=Intrpy;
     float maxinG=0;
     float dsize;
+    int index=0;
+    std::vector<attributenode*>buff;
     attributenode* p;
 for(int i=0;i<attributes.size();i++)
     {   inG=Intrpy;
@@ -125,7 +190,37 @@ for(int i=0;i<attributes.size();i++)
             {
             maxinG=inG;
             p=attributes[i];
+            index=i;
             }
+    buff.push_back(attributes[i]);
+    }
+    buff.erase(buff.begin()+index);
+    for(int k=0;k<p->MyValues.size();k++)
+    {
+        for(int m =0;m<buff.size();m++)
+        {
+            if(!buff[m]->MyValues.empty())
+            {
+            attributenode* r=new attributenode;
+            r->Name+=buff[m]->Name;
+            r->Myindex=buff[m]->Myindex;
+            r->Parentvalue=p->MyValues[k];
+            //std::cout<<r->Parentvalue->Name;
+            for(int h=0;h<buff[m]->MyValues.size();h++)
+                {
+                    if(!buff[m]->MyValues.empty())
+                        {
+                            Valuenode* q=new Valuenode;
+                            q->Name+=buff[m]->MyValues[h]->Name;
+                            q->Myattribute=r;
+                            r->MyValues.push_back(q);
+                        }
+
+                }
+            p->MyValues[k]->Posatt.push_back(r);
+            }
+
+        }
     }
     return p;
 }
@@ -243,6 +338,25 @@ std::getline(std::cin, line);
 
 }
 	}
+void solve(attributenode* AN,int spaces)
+{
+    for(int i=0;i<AN->MyValues.size();i++)
+    {   for(int j=0;j<spaces;j++)
+        std::cout<<"  ";
+        std::cout<<AN->Name<<": "<<AN->MyValues[i]->Name<<std::endl;
+        if(!AN->MyValues[i]->Myresult.empty())
+        {
+            for(int t=0;t<spaces+1;t++)
+                std::cout<<"  ";
+            std::cout<<"ANSWER: "<<AN->MyValues[i]->Myresult<<std::endl;
+        }
+        else{
+            Nextatt(AN->MyValues[i]);
+            solve(AN->MyValues[i]->Nextattribute,spaces+1);
+        }
+    }
+    return;
+}
 
 int main(){
     while(!fdata)
@@ -251,12 +365,18 @@ int main(){
     }
     Fresult=attributes[(attributes.size()-1)];
     attributes.pop_back();
-    std::cout<<Dset.size();
-    std::cout<<attributes.size()<<std::endl;
+    //std::cout<<Dset.size();
+    //std::cout<<attributes.size()<<std::endl;
     //std::cout<<attributes[(attributes.size()-1)]->Name<<std::endl;
     //std::cout<<Fresult->Name;
     Intrpy=initentropy();
-    std::cout<<Intrpy;
+    //std::cout<<Intrpy;
+
     Head=inatt();
-    std::cout<<Head->Name;
+    solve(Head,0);
+    //std::cout<<Head->MyValues[1]->myentropy;
+    //Nextatt(Head->MyValues[1]);
+    //std::cout<<Head->MyValues[1]->Nextattribute->Name;
+    //std::cout<<Head->MyValues[0]->Posatt[0]->MyValues[0]->Myattribute->Parentvalue->Name;
+
 }
