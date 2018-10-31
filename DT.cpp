@@ -96,12 +96,19 @@ for(int i=0;i<Fresult->MyValues.size();i++)
     dsize=VN->mysize;
     p=Nres/dsize;
     ntrpy+=-1*(p)* log2 (p);
-    if(ntrpy==0)
-        VN->Myresult+=Fresult->MyValues[i]->Name;
+    if(ntrpy<0.1)
+       {VN->Myresult+=Fresult->MyValues[i]->Name;
+    //std::cout<<"assigned"<<VN->Name;
     }
+    }
+
     Nres=0;
 
 }
+if(VN->mysize==0){
+        ntrpy=1;
+       VN->Myresult+="Not Determined";
+    }
 VN->myentropy=ntrpy;
 return ntrpy;
 }
@@ -373,8 +380,9 @@ int main(){
     //std::cout<<Intrpy;
 
     Head=inatt();
+    //std::cout<<Head->MyValues[0]->myentropy;
     solve(Head,0);
-    //std::cout<<Head->MyValues[1]->myentropy;
+
     //Nextatt(Head->MyValues[1]);
     //std::cout<<Head->MyValues[1]->Nextattribute->Name;
     //std::cout<<Head->MyValues[0]->Posatt[0]->MyValues[0]->Myattribute->Parentvalue->Name;
